@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manager Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome, {{ manager.first_name }} {{ manager.last_name }}</h2>
+        <a href="{{ url_for('logout') }}">Logout</a>
+
+        {% for data in employee_data %}
+        <h3>Employee: {{ data.employee.first_name }} {{ data.employee.last_name }}</h3>
+        <p>Job Title: {{ data.employee.job_title }}</p>
+
+        <h4>Clients</h4>
+        <ul>
+            {% for client in data.clients %}
+            <li>{{ client.first_name }} {{ client.last_name }}</li>
+            {% endfor %}
+        </ul>
+
+        <h4>Investments</h4>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Client</th>
+                <th>Shares</th>
+                <th>Purchase Price</th>
+                <th>Current Price</th>
+                <th>Market Value</th>
+                <th>Gain/Loss %</th>
+                <th>Company</th>
+            </tr>
+            {% for investment in data.investments %}
+            <tr>
+                <td>{{ investment.investment_id }}</td>
+                <td>{{ investment.client_id }}</td>
+                <td>{{ investment.shares_purchased }}</td>
+                <td>{{ investment.purchase_price_per_share }}</td>
+                <td>{{ investment.current_price }}</td>
+                <td>{{ investment.market_value }}</td>
+                <td>{{ investment.gain_loss_percent }}</td>
+                <td>{{ investment.company.company_name if investment.company else "N/A" }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8">No investments found</td></tr>
+            {% endfor %}
+        </table>
+        <hr>
+        {% endfor %}
+    </div>
+</body>
+</html>

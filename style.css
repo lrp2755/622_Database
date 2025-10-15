@@ -1,0 +1,187 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f6fa;
+    color: #2f3640;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: 50px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h2, h3 {
+    color: #192a56;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table, th, td {
+    border: 1px solid #dcdde1;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: #718093;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f1f2f6;
+}
+
+a {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #273c75;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+a:hover {
+    background-color: #192a56;
+}
+
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 5px;
+    border: 1px solid #dcdde1;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #44bd32;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #4cd137;
+}
+
+/* Login container as a square */
+.login-container {
+    width: 400px;             /* fixed width */
+    height: 400px;            /* fixed height to make it roughly square */
+    margin: 100px auto;       /* center on screen */
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;  /* center content vertically */
+    align-items: center;      /* center content horizontally */
+    text-align: center;
+}
+
+/* Keep input and button styling consistent */
+/* Login Page Square */
+.login-container {
+    width: 400px;
+    height: 400px;
+    margin: 100px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.login-container input[type=text],
+.login-container input[type=password] {
+    width: 80%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #dcdde1;
+}
+.login-container button {
+    padding: 10px 20px;
+    background-color: #44bd32;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.login-container button:hover {
+    background-color: #4cd137;
+}
+
+/* Dashboard enhancements */
+.dashboard-container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.client-block, .employee-block {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.client-block h3, .employee-block h3 {
+    margin: 0 0 10px 0;
+    color: #192a56;
+}
+
+.client-block table, .employee-block table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.client-block th, .employee-block th,
+.client-block td, .employee-block td {
+    border: 1px solid #dcdde1;
+    padding: 8px;
+}
+
+.client-block th, .employee-block th {
+    background-color: #718093;
+    color: white;
+}
+
+.client-block tr:nth-child(even), .employee-block tr:nth-child(even) {
+    background-color: #f1f2f6;
+}
+.logout-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 16px;
+    background-color: #e84118;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.logout-button:hover {
+    background-color: #c23616;
+}
