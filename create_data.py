@@ -48,7 +48,7 @@ def create_employees():
             base_salary=random.randint(60000, 150000),
             commission_rate=round(random.uniform(0.01, 0.05), 2),
             license_number=''.join(random.choices('0123456789', k=6)),
-            license_expiry_date=fake.date_between(start_date='+1y', end_date='+5y')
+            license_expiry_date=fake.date_between(start_date='+1y', end_date='+5y'),
         )
         employees.append(emp)
 
@@ -119,6 +119,7 @@ def create_clients(employees, companies):
             client_id=2000 + i,
             first_name=first_name,
             last_name=last_name,
+            ssn=fake.ssn(),
             date_of_birth=fake.date_of_birth(minimum_age=25, maximum_age=80),
             gender=gender,
             marital_status=random.choice(["Single", "Married", "Divorced", "Widowed"]),

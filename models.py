@@ -33,6 +33,7 @@ class Client(Base):
     client_id = Column(Integer, primary_key=True, index=True)
     first_name = Column(String)
     last_name = Column(String)
+    ssn = Column(String, unique=True)
     date_of_birth = Column(Date)
     gender = Column(String)
     marital_status = Column(String)
