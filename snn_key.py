@@ -1,15 +1,13 @@
-# snn_key.py
 import os, base64
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives import hashes, hmac
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 # Accept either name; prefer MY_APP_MASTER_SECRET but SECRET_KEY works too.
-_MASTER_B64 = os.environ.get("MY_APP_MASTER_SECRET") or os.environ.get("SECRET_KEY")
+_MASTER_B64 = os.environ.get("SECRET_KEY")
 if not _MASTER_B64:
     raise RuntimeError(
-        "Missing encryption key. Set MY_APP_MASTER_SECRET (preferred) or SECRET_KEY "
-        "to a base64-encoded 32-byte random value."
+        "Missing encryption key. Set SECRET_KEY to a base64-encoded 32-byte random value."
     )
 
 try:
