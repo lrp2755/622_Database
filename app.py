@@ -2,8 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.security import check_password_hash
 from database import SessionLocal, engine
 from models import Base, Employee, Client, Investment, Company
+from flask import Flask, render_template, redirect, url_for, request, session
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = "fake_investing_secret"
 
 # Create tables
@@ -77,6 +78,9 @@ def client_dashboard():
 def employee_dashboard():
     if session.get("user_type") != "employee":
         return redirect(url_for("login"))
+    # <-- Security check added here
+    if not session.get("verified"):
+        return redirect(url_for("security_check"))
 
     db = SessionLocal()
     employee = db.query(Employee).get(session["user_id"])
@@ -95,33 +99,121 @@ def employee_dashboard():
 # ----------------------------
 # Manager Dashboard
 # ----------------------------
-@app.route("/manager_dashboard")
+'''@app.route("/manager_dashboard", methods=["GET", "POST"])
 def manager_dashboard():
     if session.get("user_type") != "manager":
         return redirect(url_for("login"))
 
     db = SessionLocal()
     manager = db.query(Employee).get(session["user_id"])
-
-    # Employees under this manager
     employees = db.query(Employee).filter(Employee.manager_id == manager.employee_id).all()
 
-    # Map employee -> clients and investments
-    employee_data = []
-    for emp in employees:
-        clients = db.query(Client).filter(Client.advisor_id == emp.employee_id).all()
-        investments = db.query(Investment).filter(Investment.advisor_id == emp.employee_id).all()
-        for inv in investments:
-            inv.company = db.query(Company).get(inv.company_id)
-        employee_data.append({
-            "employee": emp,
-            "clients": clients,
-            "investments": investments
-        })
+    # Determine if a client has been requested to see investment info
+    requested_client_id = session.get("requested_client_id")
+    verified = session.get("verified", False)
 
-    return render_template("manager_dashboard.html",
-                           manager=manager,
-                           employee_data=employee_data)
+    data = []  # List of (employee, client, investments)
+    for emp in employees:
+        for client in emp.clients:
+            # By default, no investments visible
+            investments = []
+            if verified and requested_client_id == client.client_id:
+                # Load investments and attach companies
+                investments = db.query(Investment).filter(Investment.client_id == client.client_id).all()
+                for inv in investments:
+                    inv.company = db.query(Company).get(inv.company_id)
+            data.append((emp, client, investments))
+
+    return render_template(
+        "manager_dashboard.html",
+        manager=manager,
+        employees=employees,
+        data=data,
+        verified=verified
+    )
+'''
+@app.route("/manager_dashboard", methods=["GET", "POST"])
+def manager_dashboard():
+    if session.get("user_type") != "manager":
+        return redirect(url_for("login"))
+
+    db = SessionLocal()
+    manager = db.query(Employee).get(session["user_id"])
+    if not manager:
+        return "Manager not found", 404
+
+    employees = db.query(Employee).filter(Employee.manager_id == manager.employee_id).all()
+
+    hierarchy = []
+    for emp in employees:
+        emp_clients = db.query(Client).filter(Client.advisor_id == emp.employee_id).all()
+        clients_list = []
+        for c in emp_clients:
+            # Initialize empty investments; only show when verified
+            c.investments = []
+            clients_list.append({"client": c, "investments": c.investments})
+        hierarchy.append({"employee": emp, "clients": clients_list})
+
+    return render_template(
+        "manager_dashboard.html",
+        manager=manager,
+        employees=employees,
+        hierarchy=hierarchy
+    )
+# ----------------------------
+# Security Check Route
+# ----------------------------
+@app.route("/security_check/<int:client_id>", methods=["GET", "POST"])
+def security_check(client_id):
+    db = SessionLocal()
+
+    if request.method == "POST":
+        password = request.form.get("password")
+        manager = db.query(Employee).get(session["user_id"])
+        if check_password_hash(manager.password_hash, password):
+            session["verified_client_id"] = client_id
+            return redirect(url_for("manager_dashboard"))
+        else:
+            flash("Incorrect password")
+
+    # Only pass client_id to the template
+    return render_template("security_check.html", client_id=client_id)
+
+
+@app.route("/request_client_info/<int:client_id>", methods=["POST"])
+def request_client_info(client_id):
+    if session.get("user_type") != "manager":
+        return redirect(url_for("login"))
+
+    # Redirect to security check with client_id
+    return redirect(url_for("security_check", client_id=client_id))
+
+
+
+@app.route("/view_client_investments")
+def view_client_investments():
+    if not session.get("verified") or "requested_client_id" not in session:
+        return redirect(url_for("manager_dashboard"))
+
+    db = SessionLocal()
+    client_id = session["requested_client_id"]
+    client = db.query(Client).get(client_id)
+
+    # Make sure the manager can only view their own clients
+    manager = db.query(Employee).get(session["user_id"])
+    if client.advisor.manager_id != manager.employee_id:
+        flash("You cannot view this client's data.")
+        return redirect(url_for("manager_dashboard"))
+
+    investments = db.query(Investment).filter(Investment.client_id == client.client_id).all()
+    for inv in investments:
+        inv.company = db.query(Company).get(inv.company_id)
+
+    # Clear the verification/session after viewing
+    session.pop("verified", None)
+    session.pop("requested_client_id", None)
+
+    return render_template("client_investments.html", client=client, investments=investments)
 
 # ----------------------------
 # Logout

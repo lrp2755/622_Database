@@ -1,49 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
     <title>Employee Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
         <h2>Welcome, {{ employee.first_name }} {{ employee.last_name }}</h2>
-        <a href="{{ url_for('logout') }}">Logout</a>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
 
         <h3>Your Clients</h3>
-        <ul>
-            {% for client in clients %}
-            <li>{{ client.first_name }} {{ client.last_name }}</li>
-            {% endfor %}
-        </ul>
+        <table>
+            <thead>
+                <tr>
+                    <th>Client ID</th>
+                    <th>Client Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                <tr>
+                    <td>{{ client.client_id }}</td>
+                    <td>{{ client.first_name }} {{ client.last_name }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="2">No clients assigned</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
         <h3>Your Investments</h3>
         <table>
-            <tr>
-                <th>ID</th>
-                <th>Client ID</th>
-                <th>Client Name</th>
-                <th>Shares</th>
-                <th>Purchase Price</th>
-                <th>Current Price</th>
-                <th>Market Value</th>
-                <th>Gain/Loss %</th>
-                <th>Company</th>
-            </tr>
-            {% for investment in investments %}
-            <tr>
-                <td>{{ investment.investment_id }}</td>
-                <td>{{ investment.client_id }}</td>
-                <td>{{ investment.client.first_name }} {{ investment.client.last_name }}</td>
-                <td>{{ investment.shares_purchased }}</td>
-                <td>{{ investment.purchase_price_per_share }}</td>
-                <td>{{ investment.current_price }}</td>
-                <td>{{ investment.market_value }}</td>
-                <td>{{ investment.gain_loss_percent }}</td>
-                <td>{{ investment.company.company_name if investment.company else "N/A" }}</td>
-            </tr>
-            {% else %}
-            <tr><td colspan="8">No investments found</td></tr>
-            {% endfor %}
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Client ID</th>
+                    <th>Client Name</th>
+                    <th>Shares</th>
+                    <th>Purchase Price</th>
+                    <th>Current Price</th>
+                    <th>Market Value</th>
+                    <th>Gain/Loss %</th>
+                    <th>Company</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for investment in investments %}
+                <tr>
+                    <td>{{ investment.investment_id }}</td>
+                    <td>{{ investment.client_id }}</td>
+                    <td>{{ investment.client.first_name }} {{ investment.client.last_name }}</td>
+                    <td>{{ investment.shares_purchased }}</td>
+                    <td>${{ "%.2f"|format(investment.purchase_price_per_share) }}</td>
+                    <td>${{ "%.2f"|format(investment.current_price) }}</td>
+                    <td>${{ "%.2f"|format(investment.market_value) }}</td>
+                    <td style="color: {% if investment.gain_loss_percent >= 0 %}green{% else %}red{% endif %};">
+                        {{ "%.2f"|format(investment.gain_loss_percent) }}%
+                    </td>
+                    <td>{{ investment.company.company_name if investment.company else "N/A" }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="9">No investments found</td></tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
 </body>
