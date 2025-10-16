@@ -1,3 +1,14 @@
+'''
+    CSCI - 622 - Data Security & Privacy
+    Project Phase 2 - create_data.py
+    Authors: Samuel Roberts (svr9047) & Lianna Pottgen (lrp2755)
+
+    This create_data.py file will create the randomized data and will create
+    the database for the entire system. This utilizes faker to create randomly
+    generated data for all of the users. Our team attempted to create these manually
+    randomly, but there became a lot more overlap and this library seemed to solve that
+    issue!
+'''
 import random
 from faker import Faker
 from werkzeug.security import generate_password_hash
@@ -6,9 +17,7 @@ from models import Base, Employee, Client, Investment, Company
 
 fake = Faker()
 
-# ----------------------------
-# Seed Companies
-# ----------------------------
+# -- create companies --
 def create_companies():
     company_names = ["TechCorp", "FinBank", "HealthInc", "GreenEnergy", "EduSoft"]
     companies = []
@@ -20,11 +29,12 @@ def create_companies():
         companies.append(comp)
     return companies
 
-# ----------------------------
-# Seed Employees & Managers
-# ----------------------------
+
+# -- create employees & managers --
 def create_employees():
     employees = []
+
+    # get random data for the personal side
     for i in range(10):
         gender = random.choice(["Male", "Female"])
         first_name = fake.first_name_male() if gender == "Male" else fake.first_name_female()
@@ -33,6 +43,7 @@ def create_employees():
         work_email = f"{first_name.lower()}.{last_name.lower()}@fakeinvest.com"
         password_hash = generate_password_hash("password")
 
+        # create the employee data
         emp = Employee(
             employee_id=1000 + i,
             first_name=first_name,
@@ -50,15 +61,20 @@ def create_employees():
             license_number=''.join(random.choices('0123456789', k=6)),
             license_expiry_date=fake.date_between(start_date='+1y', end_date='+5y'),
         )
+        # add this to the employees list
         employees.append(emp)
 
-    # Assign manager_id to non-managers
-    managers = [e for e in employees if e.job_title == "Manager"]
-    for emp in employees:
-        if emp.job_title != "Manager":
-            emp.manager_id = random.choice(managers).employee_id
+    # assign managers for those that aren't mangers
+    managers = []
+    for employee in employees:
+        if employee.job_title == "Manager":
+            managers.append(employee)
 
-    # Add a fixed manager and advisor for login
+    for employee in employees:
+        if employee.job_title != "Manager":
+            employee.manager_id = random.choice(managers).employee_id
+
+    # add a fixed manager and employee(advisor) for consistent login
     fixed_manager = Employee(
         employee_id=9991,
         first_name="Manager",
@@ -95,18 +111,24 @@ def create_employees():
         manager_id=fixed_manager.employee_id
     )
 
+    # add these 2 extra users
     employees.extend([fixed_manager, fixed_advisor])
 
     return employees, managers + [fixed_manager]
 
-# ----------------------------
-# Seed Clients
-# ----------------------------
+# -- create clients --
 def create_clients(employees, companies):
+    # initiate clients
     clients = []
-    advisors = [e for e in employees if e.job_title != "Manager"]
-    used_investment_ids = set()  # Track used investment IDs
+    advisors = []
+    for employee in employees:
+        if(employee.job_title != "Manager"):
+            advisors.append(employee)
 
+    # prep for user investments
+    used_investment_ids = set()
+
+    # generate 20 random clients!
     for i in range(20):
         gender = random.choice(["Male", "Female"])
         first_name = fake.first_name_male() if gender == "Male" else fake.first_name_female()
@@ -133,9 +155,10 @@ def create_clients(employees, companies):
             advisor_id=advisor.employee_id,
         )
 
-        # Generate investments for client
+        # generate random investments for client
         client.investments = []
-        for _ in range(random.randint(1, 5)):
+        random_number_of_investments = (random.randint(1, 5))
+        for i in range(0, random_number_of_investments):
             # Ensure unique investment_id
             while True:
                 inv_id = random.randint(1000, 9999)
@@ -157,16 +180,16 @@ def create_clients(employees, companies):
                 gain_loss_percent=0,
                 exit_date=None
             )
-            # Calculate market value and gain/loss
+            # calculate market value and gain/loss simply
             inv.market_value = round(inv.shares_purchased * inv.current_price, 2)
             inv.gain_loss_percent = round((inv.current_price - inv.purchase_price_per_share) / inv.purchase_price_per_share * 100, 2)
             client.investments.append(inv)
 
-        # Assign client to advisor's list
+        # assign the client to advisor's list
         advisor.clients.append(client)
         clients.append(client)
 
-    # Add a fixed client for login
+    # add a fixed client for login for the client
     fixed_client = Client(
         client_id=9999,
         first_name="Client",
@@ -184,7 +207,7 @@ def create_clients(employees, companies):
         advisor_id=advisors[0].employee_id
     )
 
-    # Generate one investment for fixed client
+    # generate investment for fixed client
     while True:
         inv_id = random.randint(1000, 9999)
         if inv_id not in used_investment_ids:
@@ -205,6 +228,7 @@ def create_clients(employees, companies):
         gain_loss_percent=0,
         exit_date=None
     )
+
     inv.market_value = round(inv.shares_purchased * inv.current_price, 2)
     inv.gain_loss_percent = round((inv.current_price - inv.purchase_price_per_share) / inv.purchase_price_per_share * 100, 2)
     fixed_client.investments = [inv]
@@ -213,36 +237,37 @@ def create_clients(employees, companies):
 
     return clients
 
-# ----------------------------
-# Seed Database
-# ----------------------------
+# -- create full database --
 def main():
+    # create databse
     db = SessionLocal()
 
-    # Drop old tables and create new
+    # create new tables
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
-    # Seed companies
+    # create companies
     companies = create_companies()
-    for comp in companies:
-        db.add(comp)
+    for company in companies:
+        db.add(company)
 
-    # Seed employees/managers
+    # create employees and managers
     employees, managers = create_employees()
-    for emp in employees:
-        db.add(emp)
+    for employee in employees:
+        db.add(employee)
 
-    # Seed clients and investments
+    # create clients and their investments
     clients = create_clients(employees, companies)
     for client in clients:
         db.add(client)
-        for inv in getattr(client, "investments", []):
-            db.add(inv)
-
+        for investment in getattr(client, "investments", []):
+            db.add(investment)
+    
+    # add all to the db!
     db.commit()
 
-    print("Database seeded successfully!")
+    # printing for double check on success
+    print("Database created successfully!")
     print("\nSample Login Credentials (password for all users: 'password'):")
     print("Manager login: manager@example.com")
     print("Advisor login: advisor@example.com")

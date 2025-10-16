@@ -1,4 +1,18 @@
-/* === Base Styles === */
+/*
+    CSCI - 622 - Data Security & Privacy
+    Project Phase 2 - style.css
+    Authors: Samuel Roberts (svr9047) & Lianna Pottgen (lrp2755)
+
+    This class, style.css) will create the styles for the different dashboards
+    utilized in our project. It is commented to be split up into different sections
+    and will be demonstrated on the front-end of our application once our app
+    is run!
+    As a note, the front-end design of the different dashboards (manager, employee,
+    and client) are all the same format, so the css is pretty simple. The login page
+    is different so it has its own css settings.
+*/
+
+/* -- base for body -- */
 body {
     font-family: Arial, sans-serif;
     background-color: #f5f6fa;
@@ -7,7 +21,7 @@ body {
     padding: 0;
 }
 
-/* === Container === */
+/* -- container -- */
 .container {
     width: 90%;
     max-width: 1100px;
@@ -18,14 +32,14 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-/* === Headings === */
+/* -- headings -- */
 h2, h3 {
     color: #192a56;
     text-align: center;
     margin-bottom: 20px;
 }
 
-/* === Forms === */
+/* -- forms -- */
 form {
     text-align: center;
     margin-bottom: 25px;
@@ -39,7 +53,7 @@ select {
     font-size: 15px;
 }
 
-/* === Tables === */
+/* -- tables -- */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -62,7 +76,7 @@ tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
-/* === Buttons & Links === */
+/* -- buttons -- */
 a {
     display: inline-block;
     padding: 10px 15px;
@@ -72,35 +86,20 @@ a {
     border-radius: 5px;
 }
 
-.logout-btn {
-    float: right;
-    background-color: #e84118;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 8px;
-    text-decoration: none;
-    margin-top: -40px;
-    margin-right: 10px;
-}
 
-.logout-btn:hover {
-    background-color: #c23616;
-}
-
-/* === Login Page === */
-/* === Login Page === */
+/* -- login -- */
 .login-container {
-    width: 400px;                  /* fixed width */
-    height: 400px;                 /* fixed height to make it square */
-    margin: 100px auto;            /* center on page */
+    width: 400px;
+    height: 400px;
+    margin: 100px auto;
     background-color: #fff;
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     display: flex;
     flex-direction: column;
-    justify-content: center;       /* vertical center */
-    align-items: center;           /* horizontal center */
+    justify-content: center;
+    align-items: center;
     text-align: center;
 }
 
@@ -133,6 +132,22 @@ a {
 
 .login-container button:hover {
     background-color: #4cd137;
+}
+
+/* -- logout -- */
+.logout-btn {
+    float: right;
+    background-color: #e84118;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-top: -40px;
+    margin-right: 10px;
+}
+
+.logout-btn:hover {
+    background-color: #c23616;
 }
 
 .flash-message {
