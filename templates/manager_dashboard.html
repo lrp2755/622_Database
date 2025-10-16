@@ -24,7 +24,8 @@
         <table>
             <tr>
                 <th>ID</th>
-                <th>Client</th>
+                <th>Client ID</th>
+                <th>Client Name</th>
                 <th>Shares</th>
                 <th>Purchase Price</th>
                 <th>Current Price</th>
@@ -36,6 +37,7 @@
             <tr>
                 <td>{{ investment.investment_id }}</td>
                 <td>{{ investment.client_id }}</td>
+                <td>{{ investment.client.first_name }} {{ investment.client.last_name }}</td>
                 <td>{{ investment.shares_purchased }}</td>
                 <td>{{ investment.purchase_price_per_share }}</td>
                 <td>{{ investment.current_price }}</td>
