@@ -6,87 +6,81 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h2>Welcome, {{ manager.first_name }} {{ manager.last_name }}</h2>
-        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+<div class="container">
+    <h2>Welcome, {{ manager.first_name }} {{ manager.last_name }}</h2>
+    <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
 
-        <h3>Your Employees and Their Clients</h3>
+    <h3>Your Employees and Their Clients</h3>
 
-        <form method="get" action="{{ url_for('manager_dashboard') }}">
-            <label for="employee_filter">Filter by Employee:</label>
-            <select name="employee_id" id="employee_filter" onchange="this.form.submit()">
-                <option value="">All Employees</option>
-                {% for emp in employees %}
-                    <option value="{{ emp.employee_id }}" {% if request.args.get('employee_id') == emp.employee_id|string %}selected{% endif %}>
-                        {{ emp.first_name }} {{ emp.last_name }} (#{{ emp.employee_id }})
-                    </option>
-                {% endfor %}
-            </select>
-        </form>
+    {% for emp_group in hierarchy %}
+        <h3>Employee: {{ emp_group['employee'].first_name }} {{ emp_group['employee'].last_name }} (#{{ emp_group['employee'].employee_id }})</h3>
 
-        {% for emp_group in hierarchy %}
-            <h3>Employee: {{ emp_group[employee].first_name }} {{ emp_group[employee].last_name }} (#{{ emp_group[employee].employee_id }})</h3>
-            {% for client_group in emp_group.clients %}
-                <div class="client-block">
-                    <h4>Client: {{ client_group[client].first_name }} {{ client_group[client].last_name }} (#{{ client_group[client].client_id }})</h4>
-                    <table>
-                        <thead>
+        {% for client_group in emp_group['clients'] %}
+            <div class="client-block">
+                <h4>Client: {{ client_group['client'].first_name }} {{ client_group['client'].last_name }} (#{{ client_group['client'].client_id }})</h4>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee Name</th>
+                            <th>Client Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ emp_group['employee'].first_name }} {{ emp_group['employee'].last_name }}</td>
+                            <td>{{ client_group['client'].first_name }} {{ client_group['client'].last_name }}</td>
+                            <td>
+                                {% if session.get('verified_client_id') == client_group['client'].client_id %}
+                                    <em>Verified — Investments Shown Below</em>
+                                {% else %}
+                                    <form method="post" action="{{ url_for('request_client_info', client_id=client_group['client'].client_id) }}">
+                                        <button type="submit">Get Client Investment Info</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        {% if session.get('verified_client_id') == client_group['client'].client_id %}
                             <tr>
-                                <th>Employee Name</th>
-                                <th>Client Name</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{{ emp_group[employee].first_name }} {{ emp_group[employee].last_name }}</td>
-                                <td>{{ client_group[client].first_name }} {{ client_group[client].last_name }}</td>
-                                <td>
-                                    {% if session.get('verified_client_id') == client_group[client].client_id %}
-                                        <em>Verified — Investments Shown Below</em>
-                                    {% else %}
-                                        <form method="post" action="{{ url_for('request_client_info', client_id=client.client_id) }}">
-                                            <button type="submit">Get Client Investment Info</button>
-                                        </form>
-                                    {% endif %}
+                                <td colspan="3">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Company</th>
+                                                <th>Shares</th>
+                                                <th>Purchase Price</th>
+                                                <th>Current Price</th>
+                                                <th>Market Value</th>
+                                                <th>Gain/Loss %</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for inv in client_group['investments'] %}
+                                                <tr>
+                                                    <td>{{ inv.company.company_name }}</td>
+                                                    <td>{{ inv.shares_purchased }}</td>
+                                                    <td>${{ "%.2f"|format(inv.purchase_price_per_share) }}</td>
+                                                    <td>${{ "%.2f"|format(inv.current_price) }}</td>
+                                                    <td>${{ "%.2f"|format(inv.market_value) }}</td>
+                                                    <td style="color: {% if inv.gain_loss_percent >= 0 %}green{% else %}red{% endif %};">
+                                                        {{ "%.2f"|format(inv.gain_loss_percent) }}%
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
-
-                    {% if session.get('verified_client_id') == client_group[client].client_id %}
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Company</th>
-                                    <th>Shares</th>
-                                    <th>Purchase Price</th>
-                                    <th>Current Price</th>
-                                    <th>Market Value</th>
-                                    <th>Gain/Loss %</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for inv in client_group[investments] %}
-                                    <tr>
-                                        <td>{{ inv.company.company_name if inv.company else "N/A" }}</td>
-                                        <td>{{ inv.shares_purchased }}</td>
-                                        <td>${{ "%.2f"|format(inv.purchase_price_per_share) }}</td>
-                                        <td>${{ "%.2f"|format(inv.current_price) }}</td>
-                                        <td>${{ "%.2f"|format(inv.market_value) }}</td>
-                                        <td style="color: {% if inv.gain_loss_percent >= 0 %}green{% else %}red{% endif %};">
-                                            {{ "%.2f"|format(inv.gain_loss_percent) }}%
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No employees found.</p>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
         {% endfor %}
-    </div>
+    {% else %}
+        <p>No employees found.</p>
+    {% endfor %}
+</div>
 </body>
 </html>
