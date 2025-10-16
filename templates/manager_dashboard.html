@@ -1,54 +1,97 @@
+<!--
+    CSCI - 622 - Data Security & Privacy
+    Project Phase 2 - manager_dashboard.html
+    Authors: Samuel Roberts (svr9047) & Lianna Pottgen (lrp2755)
+
+    This html file will handle the front end side of the manager dashboard. This
+    dashboard is very similar to the employee dashboard. The manager will be able
+    to see the employees they look over, the clients that are under those employees,
+    sort their clients by employees, and will be able to do a security check to see
+    each clients investment information!
+-->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Manager Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h2>Welcome, {{ manager.first_name }} {{ manager.last_name }}</h2>
-        <a href="{{ url_for('logout') }}">Logout</a>
+<div class="container">
+    <h2>Welcome, {{ manager.first_name }} {{ manager.last_name }}</h2>
+    <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
 
-        {% for data in employee_data %}
-        <h3>Employee: {{ data.employee.first_name }} {{ data.employee.last_name }}</h3>
-        <p>Job Title: {{ data.employee.job_title }}</p>
+    <h3>Your Employees and Their Clients</h3>
 
-        <h4>Clients</h4>
-        <ul>
-            {% for client in data.clients %}
-            <li>{{ client.first_name }} {{ client.last_name }}</li>
-            {% endfor %}
-        </ul>
+    {% for emp_group in hierarchy %}
+        <h3>Employee: {{ emp_group['employee'].first_name }} {{ emp_group['employee'].last_name }} (#{{ emp_group['employee'].employee_id }})</h3>
 
-        <h4>Investments</h4>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Client</th>
-                <th>Shares</th>
-                <th>Purchase Price</th>
-                <th>Current Price</th>
-                <th>Market Value</th>
-                <th>Gain/Loss %</th>
-                <th>Company</th>
-            </tr>
-            {% for investment in data.investments %}
-            <tr>
-                <td>{{ investment.investment_id }}</td>
-                <td>{{ investment.client_id }}</td>
-                <td>{{ investment.shares_purchased }}</td>
-                <td>{{ investment.purchase_price_per_share }}</td>
-                <td>{{ investment.current_price }}</td>
-                <td>{{ investment.market_value }}</td>
-                <td>{{ investment.gain_loss_percent }}</td>
-                <td>{{ investment.company.company_name if investment.company else "N/A" }}</td>
-            </tr>
-            {% else %}
-            <tr><td colspan="8">No investments found</td></tr>
-            {% endfor %}
-        </table>
-        <hr>
+        {% for client_group in emp_group['clients'] %}
+            <div class="client-block">
+                <h4>Client: {{ client_group['client'].first_name }} {{ client_group['client'].last_name }} (#{{ client_group['client'].client_id }})</h4>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Employee Name</th>
+                            <th>Client Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ emp_group['employee'].first_name }} {{ emp_group['employee'].last_name }}</td>
+                            <td>{{ client_group['client'].first_name }} {{ client_group['client'].last_name }}</td>
+                            <td>
+                                {% if session.get('verified_client_id') == client_group['client'].client_id %}
+                                    <em>Verified — Investments Shown Below</em>
+                                {% else %}
+                                    <form method="post" action="{{ url_for('request_client_info', client_id=client_group['client'].client_id) }}">
+                                        <button type="submit">Get Client Investment Info</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        {% if session.get('verified_client_id') == client_group['client'].client_id %}
+                            <tr>
+                                <td colspan="3">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Company</th>
+                                                <th>Shares</th>
+                                                <th>Purchase Price</th>
+                                                <th>Current Price</th>
+                                                <th>Market Value</th>
+                                                <th>Gain/Loss %</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for inv in client_group['investments'] %}
+                                                <tr>
+                                                    <td>{{ inv.company.company_name }}</td>
+                                                    <td>{{ inv.shares_purchased }}</td>
+                                                    <td>${{ "%.2f"|format(inv.purchase_price_per_share) }}</td>
+                                                    <td>${{ "%.2f"|format(inv.current_price) }}</td>
+                                                    <td>${{ "%.2f"|format(inv.market_value) }}</td>
+                                                    <td style="color: {% if inv.gain_loss_percent >= 0 %}green{% else %}red{% endif %};">
+                                                        {{ "%.2f"|format(inv.gain_loss_percent) }}%
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
         {% endfor %}
-    </div>
+    {% else %}
+        <p>No employees found.</p>
+    {% endfor %}
+</div>
 </body>
 </html>

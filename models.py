@@ -1,8 +1,18 @@
+'''
+    CSCI - 622 - Data Security & Privacy
+    Project Phase 2 - models.py
+    Authors: Samuel Roberts (svr9047) & Lianna Pottgen (lrp2755)
+
+    This models.py class is the basis for creating all of the different classes
+    (aka models or objects :) )for the program! This will create the employee,
+    client, company, and investment.
+'''
 from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
 from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()
 
+# -- creating employee --
 class Employee(Base):
     __tablename__ = "employees"
 
@@ -23,16 +33,18 @@ class Employee(Base):
     license_expiry_date = Column(Date)
     manager_id = Column(Integer, ForeignKey("employees.employee_id"), nullable=True)  # Managers can be null
 
-    # Relationships
+    # create relationships
     clients = relationship("Client", back_populates="advisor")
     investments = relationship("Investment", back_populates="advisor")
 
+# -- creating client --
 class Client(Base):
     __tablename__ = "clients"
 
     client_id = Column(Integer, primary_key=True, index=True)
     first_name = Column(String)
     last_name = Column(String)
+    ssn = Column(String, unique=True)
     date_of_birth = Column(Date)
     gender = Column(String)
     marital_status = Column(String)
@@ -49,6 +61,7 @@ class Client(Base):
     advisor = relationship("Employee", back_populates="clients")
     investments = relationship("Investment", back_populates="client")
 
+# -- create investment --
 class Investment(Base):
     __tablename__ = "investments"
 
@@ -69,6 +82,7 @@ class Investment(Base):
     advisor = relationship("Employee", back_populates="investments")
     company = relationship("Company", back_populates="investments")
 
+# -- create company --
 class Company(Base):
     __tablename__ = "companies"
 
@@ -84,5 +98,5 @@ class Company(Base):
     earnings_per_share = Column(Float)
     target_price = Column(Float)
 
-    # Relationship to investments
+    # relationship to investments
     investments = relationship("Investment", back_populates="company")

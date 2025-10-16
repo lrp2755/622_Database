@@ -1,0 +1,39 @@
+<!--
+    CSCI - 622 - Data Security & Privacy
+    Project Phase 2 - security_check.html
+    Authors: Samuel Roberts (svr9047) & Lianna Pottgen (lrp2755)
+
+    This html file is super simple and goes for the security check / verification
+    call for when employees or managers want to see their clients investment
+    information. Once this happens and security_check is called, the user will
+    need to re-input their password. Nothing too heavy is happening for
+    this phase, but it might be added to the future to take in more than just
+    the users password and do addition security clearance.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Security Check</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h2>Security Verification</h2>
+    <p>Enter your password to access client information:</p>
+    <form method="post" action="{{ url_for('security_check', client_id=client_id) }}">
+        <input type="password" name="password" placeholder="Enter your password" required>
+        <button type="submit">Verify</button>
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+            {% for message in messages %}
+                <li style="color:red">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</div>
+</body>
+</html>

@@ -1,48 +1,91 @@
+<!--
+    CSCI - 622 - Data Security & Privacy
+    Project Phase 2 - employee_dashboard.html
+    Authors: Samuel Roberts (svr9047) & Lianna Pottgen (lrp2755)
+
+    This file will create the employee dashboard that financial advisors will
+    use in order to help their clients create their investments. This looks similar
+    and has a similar se tup to the manger dashboard, so it will say the employee's
+    name, show their clients, and the employee (advisor) will be able to click a button
+    to do a security check in order to view their clients investment information.
+-->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Employee Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h2>Welcome, {{ employee.first_name }} {{ employee.last_name }}</h2>
-        <a href="{{ url_for('logout') }}">Logout</a>
+<div class="container">
+    <h2>Welcome, {{ employee.first_name }} {{ employee.last_name }}</h2>
+    <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
 
-        <h3>Your Clients</h3>
-        <ul>
-            {% for client in clients %}
-            <li>{{ client.first_name }} {{ client.last_name }}</li>
-            {% endfor %}
-        </ul>
+    <h3>Your Clients</h3>
 
-        <h3>Your Investments</h3>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Client</th>
-                <th>Shares</th>
-                <th>Purchase Price</th>
-                <th>Current Price</th>
-                <th>Market Value</th>
-                <th>Gain/Loss %</th>
-                <th>Company</th>
-            </tr>
-            {% for investment in investments %}
-            <tr>
-                <td>{{ investment.investment_id }}</td>
-                <td>{{ investment.client_id }}</td>
-                <td>{{ investment.shares_purchased }}</td>
-                <td>{{ investment.purchase_price_per_share }}</td>
-                <td>{{ investment.current_price }}</td>
-                <td>{{ investment.market_value }}</td>
-                <td>{{ investment.gain_loss_percent }}</td>
-                <td>{{ investment.company.company_name if investment.company else "N/A" }}</td>
-            </tr>
-            {% else %}
-            <tr><td colspan="8">No investments found</td></tr>
-            {% endfor %}
-        </table>
-    </div>
+    {% for client_group in clients %}
+        <div class="client-block">
+            <h4>Client: {{ client_group['client'].first_name }} {{ client_group['client'].last_name }} (#{{ client_group['client'].client_id }})</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Client Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ client_group['client'].first_name }} {{ client_group['client'].last_name }}</td>
+                        <td>
+                            {% if session.get('verified_client_id') == client_group['client'].client_id %}
+                                <em>Verified — Investments Shown Below</em>
+                            {% else %}
+                                <form method="post" action="{{ url_for('request_client_info', client_id=client_group['client'].client_id) }}">
+                                    <button type="submit">Get Client Investment Info</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% if session.get('verified_client_id') == client_group['client'].client_id %}
+                        <tr>
+                            <td colspan="2">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Company</th>
+                                            <th>Shares</th>
+                                            <th>Purchase Price</th>
+                                            <th>Current Price</th>
+                                            <th>Market Value</th>
+                                            <th>Gain/Loss %</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for inv in client_group['investments'] %}
+                                            <tr>
+                                                <td>{{ inv.company.company_name }}</td>
+                                                <td>{{ inv.shares_purchased }}</td>
+                                                <td>${{ "%.2f"|format(inv.purchase_price_per_share) }}</td>
+                                                <td>${{ "%.2f"|format(inv.current_price) }}</td>
+                                                <td>${{ "%.2f"|format(inv.market_value) }}</td>
+                                                <td style="color: {% if inv.gain_loss_percent >= 0 %}green{% else %}red{% endif %};">
+                                                    {{ "%.2f"|format(inv.gain_loss_percent) }}%
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No clients found.</p>
+    {% endfor %}
+</div>
 </body>
 </html>

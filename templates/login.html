@@ -1,26 +1,38 @@
+<!--
+    CSCI - 622 - Data Security & Privacy
+    Project Phase 2 - login.html
+    Authors: Samuel Roberts (svr9047) & Lianna Pottgen (lrp2755)
+
+    This file, login.html, will handle how all users log into the website. This
+    is pretty simple and similar to a lot of other possible log in html pages,
+    it will request the users email and password in order to log in. We do not have
+    a create account feature yet, just because that is more data privacy to be
+    developed in the future!
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Fake Investing</title>
+    <title>Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
+    <div class="login-container">
         <h2>Login</h2>
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <ul style="color:red;">
+                <div class="flash-message">
                     {% for message in messages %}
-                        <li>{{ message }}</li>
+                        <p>{{ message }}</p>
                     {% endfor %}
-                </ul>
+                </div>
             {% endif %}
         {% endwith %}
-        <form method="POST">
+
+        <form method="POST" action="{{ url_for('login') }}">
             <input type="text" name="email" placeholder="Email" required>
             <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Log In</button>
+            <button type="submit">Login</button>
         </form>
     </div>
 </body>
