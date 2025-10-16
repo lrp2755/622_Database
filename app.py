@@ -24,6 +24,15 @@ def login():
             flash("Please enter both email and password")
             return render_template("login.html")
 
+        # --- Check Client ---
+        client = db.query(Client).filter(Client.email == email).first()
+        if client and check_password_hash(client.password_hash, password):
+            session.clear()
+            session["user_type"] = "client"
+            session["user_id"] = client.client_id
+            return redirect(url_for("client_dashboard"))
+
+        # --- Check Employee ---
         employee = db.query(Employee).filter(Employee.work_email == email).first()
         if employee and check_password_hash(employee.password_hash, password):
             session.clear()
@@ -37,7 +46,9 @@ def login():
                 return redirect(url_for("employee_dashboard"))
 
         flash("Invalid credentials")
+
     return render_template("login.html")
+
 
 # ----------------------------
 # Manager Dashboard
@@ -113,6 +124,32 @@ def employee_dashboard():
         "employee_dashboard.html",
         employee=employee,
         clients=clients_list
+    )
+# ----------------------------
+# Client Dashboard
+# ----------------------------
+@app.route("/client_dashboard")
+def client_dashboard():
+    if session.get("user_type") != "client":
+        return redirect(url_for("login"))
+
+    db = SessionLocal()
+    client = db.query(Client).get(session["user_id"])
+    if not client:
+        return "Client not found", 404
+
+    advisor = db.query(Employee).get(client.advisor_id)
+
+    # Attach companies to each investment
+    investments = db.query(Investment).filter(Investment.client_id == client.client_id).all()
+    for inv in investments:
+        inv.company = db.query(Company).get(inv.company_id)
+
+    return render_template(
+        "client_dashboard.html",
+        client=client,
+        advisor=advisor,
+        investments=investments
     )
 
 
