@@ -204,7 +204,7 @@ def create_clients(employees, companies):
         employment_status="Employed",
         annual_income=75000,
         risk_tolerance="Moderate",
-        advisor_id=advisors[0].employee_id
+        advisor_id= 9992
     )
 
     # generate investment for fixed client
@@ -236,6 +236,7 @@ def create_clients(employees, companies):
     clients.append(fixed_client)
 
     return clients
+
 
 # -- create full database --
 def main():

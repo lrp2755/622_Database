@@ -1,0 +1,54 @@
+<!--
+    CSCI - 622 - Data Security & Privacy
+    Project Phase 2 - requrest_investment.html
+    Authors: Samuel Roberts (svr9047) & Lianna Pottgen (lrp2755)
+
+    This file will create request new investment form for clients to request
+    investments from. It is a super simple form, it may have changes as the
+    project continue but right now it is in a good state of working to connect
+    the advisor and client users.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Request New Investment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h2>Request New Investment</h2>
+    <p>Advisor: {{ advisor.first_name }} {{ advisor.last_name }}</p>
+
+    <form method="POST">
+        <label for="company_id">Company:</label>
+        <select name="company_id" id="company_id" required>
+            <option value="">--Select a company--</option>
+            {% for company in companies %}
+                <option value="{{ company.company_id }}">{{ company.company_name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="shares">Shares to Purchase:</label>
+        <input type="number" name="shares" id="shares" min="1" required>
+
+        <label for="purchase_price_per_share">Price per Share:</label>
+        <input type="number" name="purchase_price_per_share" id="purchase_price_per_share" step="0.01" min="0" required>
+
+        <button type="submit">Submit Request</button>
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+            {% for message in messages %}
+                <li style="color:green">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <a href="{{ url_for('client_dashboard') }}">Back to Dashboard</a>
+</div>
+</body>
+</html>

@@ -9,6 +9,9 @@
 
     The HTML / front end design look includes a table of what the users investments
     are, a header saying their name, and a header saying their financial advisor.
+    The most recent addition include that the client will be able to request an
+    investment from their financial advisor, so a table with the investment informaitno
+    will be displayed on the top of their dashboard!
 -->
 
 <!DOCTYPE html>
@@ -19,44 +22,105 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h2>Welcome, {{ client.first_name }} {{ client.last_name }}</h2>
-        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
 
-        <h3>Your Advisor</h3>
-        <p>{{ advisor.first_name }} {{ advisor.last_name }} (#{{ advisor.employee_id }})</p>
+<div class="container">
+    <h2>Welcome, {{ client.first_name }} {{ client.last_name }}</h2>
+    <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
 
-        <h3>Your Investments</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Shares</th>
-                    <th>Purchase Price</th>
-                    <th>Current Price</th>
-                    <th>Market Value</th>
-                    <th>Gain/Loss %</th>
-                    <th>Company</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for investment in investments %}
-                <tr>
-                    <td>{{ investment.investment_id }}</td>
-                    <td>{{ investment.shares_purchased }}</td>
-                    <td>${{ "%.2f"|format(investment.purchase_price_per_share) }}</td>
-                    <td>${{ "%.2f"|format(investment.current_price) }}</td>
-                    <td>${{ "%.2f"|format(investment.market_value) }}</td>
-                    <td style="color: {% if investment.gain_loss_percent >= 0 %}green{% else %}red{% endif %};">
+    <h3>Your Advisor</h3>
+    <p>{{ advisor.first_name }} {{ advisor.last_name }} (#{{ advisor.employee_id }})</p>
+
+    <form method="get" action="{{ url_for('request_investment', client_id=client.client_id) }}" style="display:inline-block; margin-left:20px;">
+        <button type="submit" class="btn-request-investment">Request New Investment</button>
+    </form>
+
+    <h3>Current Requests</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Shares</th>
+                <th>Purchase Price</th>
+                <th>Status</th>
+                <th>Requested On</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for req in requests %}
+            <tr>
+                <td>{{ req.company.company_name if req.company else "N/A" }}</td>
+                <td>{{ req.shares if req.shares is not none else "N/A" }}</td>
+                <td>
+                    {% if req.purchase_price_per_share is not none %}
+                        ${{ "%.2f"|format(req.purchase_price_per_share) }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>{{ req.status }}</td>
+                <td>{{ req.created_at.strftime("%Y-%m-%d %H:%M") if req.created_at else "N/A" }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">No requests found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Your Investments</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Shares</th>
+                <th>Purchase Price</th>
+                <th>Current Price</th>
+                <th>Market Value</th>
+                <th>Gain/Loss %</th>
+                <th>Company</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for investment in investments %}
+            <tr>
+                <td>{{ investment.investment_id }}</td>
+                <td>{{ investment.shares_purchased if investment.shares_purchased is not none else "N/A" }}</td>
+                <td>
+                    {% if investment.purchase_price_per_share is not none %}
+                        ${{ "%.2f"|format(investment.purchase_price_per_share) }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>
+                    {% if investment.current_price is not none %}
+                        ${{ "%.2f"|format(investment.current_price) }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>
+                    {% if investment.market_value is not none %}
+                        ${{ "%.2f"|format(investment.market_value) }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td style="color: {% if investment.gain_loss_percent is not none and investment.gain_loss_percent >= 0 %}green{% elif investment.gain_loss_percent is not none %}red{% else %}black{% endif %};">
+                    {% if investment.gain_loss_percent is not none %}
                         {{ "%.2f"|format(investment.gain_loss_percent) }}%
-                    </td>
-                    <td>{{ investment.company.company_name if investment.company else "N/A" }}</td>
-                </tr>
-                {% else %}
-                <tr><td colspan="7">No investments found</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>{{ investment.company.company_name if investment.company else "N/A" }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7">No investments found</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

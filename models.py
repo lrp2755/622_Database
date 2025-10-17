@@ -7,8 +7,9 @@
     (aka models or objects :) )for the program! This will create the employee,
     client, company, and investment.
 '''
-from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, DateTime
 from sqlalchemy.orm import relationship, declarative_base
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -60,6 +61,7 @@ class Client(Base):
     # Relationships
     advisor = relationship("Employee", back_populates="clients")
     investments = relationship("Investment", back_populates="client")
+    requests = relationship("InvestmentRequest", back_populates="client")
 
 # -- create investment --
 class Investment(Base):
@@ -81,6 +83,23 @@ class Investment(Base):
     client = relationship("Client", back_populates="investments")
     advisor = relationship("Employee", back_populates="investments")
     company = relationship("Company", back_populates="investments")
+
+# -- create investment request
+class InvestmentRequest(Base):
+    __tablename__ = "investment_requests"
+    request_id = Column(Integer, primary_key=True, autoincrement=True)
+    client_id = Column(Integer, ForeignKey("clients.client_id"))
+    advisor_id = Column(Integer, ForeignKey("employees.employee_id"))
+    company_id = Column(Integer, ForeignKey("companies.company_id"))
+    shares = Column(Integer)
+    purchase_price_per_share = Column(Float, nullable=True)
+    status = Column(String, default="Pending")  # Pending, Approved, Rejected
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    client = relationship("Client", back_populates="requests")
+    advisor = relationship("Employee")
+    company = relationship("Company")
+
 
 # -- create company --
 class Company(Base):
