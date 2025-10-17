@@ -90,7 +90,7 @@ class InvestmentRequest(Base):
     request_id = Column(Integer, primary_key=True, autoincrement=True)
     client_id = Column(Integer, ForeignKey("clients.client_id"))
     advisor_id = Column(Integer, ForeignKey("employees.employee_id"))
-    company_id = Column(Integer, ForeignKey("companies.company_id"), nullable=True)
+    company_id = Column(Integer, ForeignKey("companies.company_id"))
     shares = Column(Integer)
     purchase_price_per_share = Column(Float, nullable=True)
     status = Column(String, default="Pending")  # Pending, Approved, Rejected

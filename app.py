@@ -124,6 +124,10 @@ def employee_dashboard():
     if not employee:
         return "Employee not found", 404
 
+    requests = db.query(InvestmentRequest).filter(
+        InvestmentRequest.advisor_id == employee.employee_id
+    ).all()
+
     # build clients for the table for this employee
     verified_client_id = session.get("verified_client_id")
     clients_list = []
@@ -142,11 +146,18 @@ def employee_dashboard():
 
         clients_list.append({"client": clients, "investments": c_investments})
 
-    # show to user
+    client_requests = db.query(InvestmentRequest).filter(
+        InvestmentRequest.advisor_id == employee.employee_id
+    ).order_by(InvestmentRequest.created_at.desc()).all()
+    for req in client_requests:
+        req.client = db.query(Client).get(req.client_id)
+        req.company = db.query(Company).get(req.company_id)
+
     return render_template(
         "employee_dashboard.html",
         employee=employee,
-        clients=clients_list
+        clients=clients_list,
+        client_requests=client_requests
     )
 
 # -- employee approval --
@@ -184,12 +195,17 @@ def client_dashboard():
     for inv in investments:
         inv.company = db.query(Company).get(inv.company_id)
 
+    requests = db.query(InvestmentRequest).filter(InvestmentRequest.client_id == client.client_id).all()
+    for req in requests:
+        req.company = db.query(Company).get(req.company_id)
+
     # show to client user
     return render_template(
         "client_dashboard.html",
         client=client,
         advisor=advisor,
-        investments=investments
+        investments=investments,
+        requests = requests
     )
 # -- client request investment -- 
 @app.route("/create_investment_request", methods=["POST"])
@@ -212,6 +228,138 @@ def create_investment_request():
     db.commit()
     flash("Investment request sent to your advisor.")
     return redirect(url_for("client_dashboard"))
+
+@app.route("/approve_request/<int:request_id>", methods=["POST"])
+def approve_request(request_id):
+    db = SessionLocal()
+    req = db.query(InvestmentRequest).get(request_id)
+    if not req:
+        flash("Request not found")
+        return redirect(url_for("employee_dashboard"))
+
+    req.status = "Approved"
+    # Optionally create the investment automatically
+    new_investment = Investment(
+        client_id=req.client_id,
+        advisor_id=req.advisor_id,
+        company_id=req.company_id,
+        shares_purchased=req.shares,
+        purchase_price_per_share=req.purchase_price_per_share,
+        current_price=req.purchase_price_per_share
+    )
+    db.add(new_investment)
+    db.commit()
+    flash("Investment request approved and investment created")
+    return redirect(url_for("employee_dashboard"))
+
+@app.route("/deny_request/<int:request_id>", methods=["POST"])
+def deny_request(request_id):
+    db = SessionLocal()
+    req = db.query(InvestmentRequest).get(request_id)
+    if not req:
+        flash("Request not found")
+        return redirect(url_for("employee_dashboard"))
+
+    req.status = "Rejected"
+    db.commit()
+    flash("Investment request denied")
+    return redirect(url_for("employee_dashboard"))
+
+
+# -- request route --
+'''
+@app.route("/request_investment/<int:client_id>", methods=["GET", "POST"])
+def request_investment(client_id):
+    if session.get("user_type") != "client":
+        return redirect(url_for("login"))
+
+    db = SessionLocal()
+    client = db.query(Client).get(client_id)
+    advisor = db.query(Employee).get(client.advisor_id)
+    companies = db.query(Company).all()
+
+    if request.method == "POST":
+        company_name = request.form.get("company_name")
+        shares = request.form.get("shares")
+        purchase_price = request.form.get("purchase_price_per_share")
+
+        # Look up or create company
+        company = db.query(Company).filter(Company.company_name == company_name).first()
+        if not company:
+            company = Company(company_name=company_name)
+            db.add(company)
+            db.commit()
+
+        # Create InvestmentRequest
+        new_request = InvestmentRequest(
+            client_id=client.client_id,
+            advisor_id=advisor.employee_id,
+            company_id=company.company_id,
+            shares=int(shares),
+            purchase_price_per_share=float(purchase_price),
+            status="Pending"
+        )
+        db.add(new_request)
+        db.commit()
+
+        flash("Investment request submitted!")
+        return redirect(url_for("client_dashboard"))
+
+    return render_template("request_investment.html", client=client, advisor=advisor, companies = companies)
+'''
+# -- request investments with no parmas
+@app.route("/request_investment", methods=["GET", "POST"])
+def request_investment():
+    if session.get("user_type") != "client":
+        return redirect(url_for("login"))
+
+    db = SessionLocal()
+    client = db.query(Client).get(session["user_id"])
+    if not client:
+        return "Client not found", 404
+
+    advisor = db.query(Employee).get(client.advisor_id)
+    if not advisor:
+        return "Advisor not found", 404
+
+    # Get all companies for dropdown
+    companies = db.query(Company).all()
+
+    if request.method == "POST":
+        company_id = request.form.get("company_id")
+        shares = request.form.get("shares")
+        purchase_price = request.form.get("purchase_price_per_share")
+
+        # Validation
+        if not company_id or not shares or not purchase_price:
+            flash("All fields are required")
+            return redirect(request.url)
+
+        try:
+            new_request = InvestmentRequest(
+                client_id=client.client_id,
+                advisor_id=advisor.employee_id,
+                company_id=int(company_id),
+                shares=int(shares),
+                purchase_price_per_share=float(purchase_price),
+                status="Pending"
+            )
+            db.add(new_request)
+            db.commit()
+            flash("Investment request submitted successfully!")
+            return redirect(url_for("client_dashboard"))
+        except Exception as e:
+            db.rollback()
+            flash(f"Error submitting request: {str(e)}")
+            return redirect(request.url)
+
+    return render_template(
+        "request_investment.html",
+        client=client,
+        advisor=advisor,
+        companies=companies
+    )
+
 
 # -- client investment approval -- 
 @app.route("/approve_investment/<int:request_id>", methods=["POST"])
