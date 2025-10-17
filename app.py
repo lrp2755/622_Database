@@ -265,48 +265,6 @@ def deny_request(request_id):
     flash("Investment request denied")
     return redirect(url_for("employee_dashboard"))
 
-
-# -- request route --
-'''
-@app.route("/request_investment/<int:client_id>", methods=["GET", "POST"])
-def request_investment(client_id):
-    if session.get("user_type") != "client":
-        return redirect(url_for("login"))
-
-    db = SessionLocal()
-    client = db.query(Client).get(client_id)
-    advisor = db.query(Employee).get(client.advisor_id)
-    companies = db.query(Company).all()
-
-    if request.method == "POST":
-        company_name = request.form.get("company_name")
-        shares = request.form.get("shares")
-        purchase_price = request.form.get("purchase_price_per_share")
-
-        # Look up or create company
-        company = db.query(Company).filter(Company.company_name == company_name).first()
-        if not company:
-            company = Company(company_name=company_name)
-            db.add(company)
-            db.commit()
-
-        # Create InvestmentRequest
-        new_request = InvestmentRequest(
-            client_id=client.client_id,
-            advisor_id=advisor.employee_id,
-            company_id=company.company_id,
-            shares=int(shares),
-            purchase_price_per_share=float(purchase_price),
-            status="Pending"
-        )
-        db.add(new_request)
-        db.commit()
-
-        flash("Investment request submitted!")
-        return redirect(url_for("client_dashboard"))
-
-    return render_template("request_investment.html", client=client, advisor=advisor, companies = companies)
-'''
 # -- request investments with no parmas
 @app.route("/request_investment", methods=["GET", "POST"])
 def request_investment():
