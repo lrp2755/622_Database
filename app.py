@@ -14,7 +14,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import check_password_hash
 from database import SessionLocal, engine
-from models import Base, Employee, Client, Investment, Company
+from models import Base, Employee, Client, Investment, Company, InvestmentRequest
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = "fake_investing_secret"
@@ -149,6 +149,20 @@ def employee_dashboard():
         clients=clients_list
     )
 
+# -- employee approval --
+@app.route("/advisor_create_investment/<int:request_id>", methods=["POST"])
+def advisor_create_investment(request_id):
+    if session.get("user_type") != "employee":
+        return redirect(url_for("login"))
+
+    db = SessionLocal()
+    req = db.query(InvestmentRequest).get(request_id)
+    req.status = "AdvisorCreated"  # Flag that advisor has prepared investment
+
+    db.commit()
+    flash("Investment prepared. Client must approve.")
+    return redirect(url_for("employee_dashboard"))
+
 # -- client dashboard --
 @app.route("/client_dashboard")
 def client_dashboard():
@@ -177,6 +191,68 @@ def client_dashboard():
         advisor=advisor,
         investments=investments
     )
+# -- client request investment -- 
+@app.route("/create_investment_request", methods=["POST"])
+def create_investment_request():
+    if session.get("user_type") != "client":
+        return redirect(url_for("login"))
+
+    db = SessionLocal()
+    client_id = session["user_id"]
+    company_name = request.form.get("company_name")
+    shares = int(request.form.get("shares"))
+
+    new_request = InvestmentRequest(
+        client_id=client_id,
+        company_name=company_name,
+        shares=shares,
+        status="Pending"
+    )
+    db.add(new_request)
+    db.commit()
+    flash("Investment request sent to your advisor.")
+    return redirect(url_for("client_dashboard"))
+
+# -- client investment approval -- 
+@app.route("/approve_investment/<int:request_id>", methods=["POST"])
+def approve_investment(request_id):
+    if session.get("user_type") != "client":
+        return redirect(url_for("login"))
+
+    session["requested_request_id"] = request_id
+    return redirect(url_for("security_check_for_investment"))
+
+# -- client investment approval validation -- 
+@app.route("/security_check_investment", methods=["GET", "POST"])
+def security_check_for_investment():
+    db = SessionLocal()
+    client = db.query(Client).get(session["user_id"])
+    request_id = session.get("requested_request_id")
+    req = db.query(InvestmentRequest).get(request_id)
+
+    if request.method == "POST":
+        password = request.form.get("password")
+        if check_password_hash(client.password_hash, password):
+            # Create the actual investment
+            investment = Investment(
+                client_id=client.client_id,
+                company_id=None,  # create company if needed
+                shares_purchased=req.shares,
+                purchase_price_per_share=0,  # set current price
+                current_price=0,
+                market_value=0
+            )
+            db.add(investment)
+            req.status = "Approved"
+            db.commit()
+            session.pop("requested_request_id", None)
+            flash("Investment approved and created!")
+            return redirect(url_for("client_dashboard"))
+        else:
+            flash("Incorrect password")
+
+    return render_template("security_check.html", client_id=client.client_id)
+
 
 
 # -- requesting to see information --

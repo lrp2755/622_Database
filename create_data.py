@@ -237,6 +237,7 @@ def create_clients(employees, companies):
 
     return clients
 
+
 # -- create full database --
 def main():
     # create databse

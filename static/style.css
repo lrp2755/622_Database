@@ -86,6 +86,21 @@ a {
     border-radius: 5px;
 }
 
+.btn-request-investment {
+    padding: 8px 15px;
+    background-color: #44bd32;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-request-investment:hover {
+    background-color: #4cd137;
+}
+
+
 
 /* -- login -- */
 .login-container {

@@ -17,9 +17,37 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+
 <div class="container">
     <h2>Welcome, {{ employee.first_name }} {{ employee.last_name }}</h2>
     <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+
+    <h3>Pending Investment Requests</h3>
+    <table>
+    <thead>
+        <tr>
+            <th>Client</th>
+            <th>Company</th>
+            <th>Shares</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for req in pending_requests %}
+    <tr>
+        <td>{{ req.client.first_name }} {{ req.client.last_name }}</td>
+        <td>{{ req.company_name }}</td>
+        <td>{{ req.shares }}</td>
+        <td>
+            <form method="post" action="{{ url_for('advisor_create_investment', request_id=req.request_id) }}">
+                <button type="submit">Create Investment</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
 
     <h3>Your Clients</h3>
 
