@@ -28,6 +28,7 @@ Werkzeug is an addition that helps with our security hashing for passwords and s
         a.) pip install flask
         b.) pip install faker
         c.) pip install werkzeug
+        d.) pip install cryptography
     2.) Generate the secret key
         python3
         >> import os, base64
