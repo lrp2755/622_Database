@@ -16,6 +16,7 @@ information.
     1.) pip install flask
     2.) pip install faker
     3.) pip install werkzeug
+    4.) pip install cryptography
 Flask is our API handler and helps us to start up our API and website portion of our program.
 
 Faker is a small import that simply helps us to randomize data for random data generation. We 
@@ -28,8 +29,14 @@ Werkzeug is an addition that helps with our security hashing for passwords and s
         a.) pip install flask
         b.) pip install faker
         c.) pip install werkzeug
-    2.) python create_data.py
-    3.) python app.py
+        d.) pip install cryptography
+    2.) Generate the secret key
+        python3
+        >> import os, base64
+        >> print(base64.b64encode(os.urandom(32)))
+        $env:SECRET_KEY="the key from the print statement"
+    3.) python create_data.py
+    4.) python app.py
 
 ## Steps to utilize API
     Users:
