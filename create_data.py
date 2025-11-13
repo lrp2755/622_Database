@@ -198,7 +198,7 @@ def create_clients(employees, companies):
         client_id=9999,
         first_name="Client",
         last_name="One",
-        encrypted_ssn=encrypt_ssn(fixed_plain_ssn),  # <-- add these
+        encrypted_ssn=encrypt_ssn(fixed_plain_ssn),  
         ssn_hash=ssn_hash(fixed_plain_ssn),
         date_of_birth=fake.date_of_birth(minimum_age=30, maximum_age=65),
         gender="Female",
