@@ -31,13 +31,8 @@ Werkzeug is an addition that helps with our security hashing for passwords and s
         d.) pip install cryptography
         e.) pip install psycopg2-binary
         f.) pip install sqlalchemy psycopg2-binary
-    2.) Generate the secret key
-        python3
-        >> import os, base64
-        >> print(base64.b64encode(os.urandom(32)))
-        $env:SECRET_KEY="the key from the print statement"
-    3.) python create_data.py
-    4.) python app.py
+    2.) psql "host=ritfinanceserver622.postgres.database.azure.com port=5432 dbname=postgres user=LiannaPottgen@ritfinanceserver622 password=Test1234! sslmode=require"
+    3.) python app.py
 
 ## Steps to utilize API
     Users:

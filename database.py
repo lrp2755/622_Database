@@ -26,6 +26,6 @@ if __name__ == "__main__":
     try:
         with engine.connect() as conn:
             result = conn.execute(text("SELECT version();"))
-            print("✅ Connected successfully:", result.scalar())
+            print("Connected successfully:", result.scalar())
     except Exception as e:
-        print("❌ Connection failed:", e)
+        print("Connection failed:", e)

@@ -21,6 +21,54 @@
     <h2>Welcome, {{ employee.first_name }} {{ employee.last_name }}</h2>
     <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
 
+<<<<<<< HEAD
+    <h3>Pending Client Investment Requests</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Client</th>
+            <th>Company</th>
+            <th>Shares</th>
+            <th>Purchase Price</th>
+            <th>Action</th>
+            <th>Date</th>
+            <th>Approval</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for req in client_requests %}
+        <tr>
+            <td>{{ req.client.first_name }} {{ req.client.last_name }}</td>
+            <td>{{ req.company.company_name if req.company else "N/A" }}</td>
+            <td>{{ req.shares }}</td>
+            <td>${{ "%.2f"|format(req.purchase_price_per_share) if req.purchase_price_per_share else "N/A" }}</td>
+            <td>{{ req.status }}</td>
+            <td>{{ req.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+            <td>
+                {% if req.status == "Pending" %}
+                <form method="post" action="{{ url_for('approve_request', request_id=req.request_id) }}" style="display:inline">
+                    <button type="submit">Approve</button>
+                </form>
+                <form method="post" action="{{ url_for('deny_request', request_id=req.request_id) }}" style="display:inline">
+                    <button type="submit">Reject</button>
+                </form>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7">No requests found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+=======
+>>>>>>> main
     <h3>Your Clients</h3>
 
     {% for client_group in clients %}
