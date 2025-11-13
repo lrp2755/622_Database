@@ -1,6 +1,6 @@
 '''
     CSCI - 622 - Data Security & Privacy
-    Project Phase 2 - models.py
+    Project Phase 3 - models.py
     Authors: Samuel Roberts (svr9047) & Lianna Pottgen (lrp2755)
 
     This models.py class is the basis for creating all of the different classes

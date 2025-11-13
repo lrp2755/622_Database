@@ -1,6 +1,6 @@
 '''
     CSCI - 622 - Data Security & Privacy
-    Project Phase 2 - database.py
+    Project Phase 3 - database.py
     Authors: Samuel Roberts (svr9047) & Lianna Pottgen (lrp2755)
 
     This file just simply creates the sqlite database!

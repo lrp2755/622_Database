@@ -7,6 +7,12 @@ in a company and has 1 financial advisor, an Advisor who is involved in protecti
 data and has 1...n clients, and a Manager who has 1...n employees and can see the 1...n clients
 that their employees have.
 
+Additionally, our program runs on Microsoft AD. This allows for users information to be stored in a 
+cloud database. This gives the advantage of having consistent data between different runs of our 
+program. In the begginging of our program, our database was local which gave us the advantage of 
+having data be a bit more efficient in retaining and accessiblity. However, it did change on 
+all occurances of create_database.py since it utilized randomly generated data. 
+
 Our future goals for the program is to utilize this program to analyze how important data security
 and privacy are for users. More specifically, this program will help us to view how chain of command
 comes into play with data security and privacy with our programs ability to have managers view client

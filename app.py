@@ -1,6 +1,6 @@
 '''
     CSCI - 622 - Data Security & Privacy
-    Project Phase 2 - app.py
+    Project Phase 3 - app.py
     Authors: Samuel Roberts (svr9047) & Lianna Pottgen (lrp2755)
 
     This app.py file is our routing file! This will create the flask instance
@@ -19,10 +19,17 @@ from models import Base, Employee, Client, Investment, Company, InvestmentReques
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.secret_key = "fake_investing_secret"
 
-# Create tables
+'''
+    this will create the tables for all of the data storage
+'''
 Base.metadata.create_all(bind=engine)
 
-# -- login route (starting screen) --
+'''
+    This method starts the login (root) page for the user
+    In order for the user to interact with this page, they are required to log into their account.
+    If the user does not have a valid username and password, then they wil not be able to log in.
+    Else, they will log in and go to their respective dashboard(client, advisor, manager)
+'''
 @app.route("/", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
 def login():
