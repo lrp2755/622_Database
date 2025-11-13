@@ -8,9 +8,6 @@
     and has a similar se tup to the manger dashboard, so it will say the employee's
     name, show their clients, and the employee (advisor) will be able to click a button
     to do a security check in order to view their clients investment information.
-    The most recent addition is that employees can approve / deny investment requests
-    from their clients, this feature is still in development, but a good starting
-    grond to thoroughly research data security and privacy!
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -20,11 +17,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-
 <div class="container">
     <h2>Welcome, {{ employee.first_name }} {{ employee.last_name }}</h2>
     <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
 
+<<<<<<< HEAD
     <h3>Pending Client Investment Requests</h3>
 <table>
     <thead>
@@ -70,6 +67,8 @@
 
 
 
+=======
+>>>>>>> main
     <h3>Your Clients</h3>
 
     {% for client_group in clients %}

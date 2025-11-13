@@ -14,6 +14,7 @@ from faker import Faker
 from werkzeug.security import generate_password_hash
 from database import SessionLocal, engine
 from models import Base, Employee, Client, Investment, Company
+from snn_key import encrypt_ssn, ssn_hash
 
 fake = Faker()
 
@@ -136,23 +137,25 @@ def create_clients(employees, companies):
         email = fake.email()
         password_hash = generate_password_hash("password")
         advisor = random.choice(advisors)
+        plain_ssn = fake.ssn()
 
         client = Client(
             client_id=2000 + i,
-            first_name=first_name,
-            last_name=last_name,
-            ssn=fake.ssn(),
+            first_name=first_name,  # use generated
+            last_name=last_name,  # use generated
+            encrypted_ssn=encrypt_ssn(plain_ssn),  # required (NOT NULL)
+            ssn_hash=ssn_hash(plain_ssn),  # required (UNIQUE)
             date_of_birth=fake.date_of_birth(minimum_age=25, maximum_age=80),
-            gender=gender,
+            gender=gender,  # use generated
             marital_status=random.choice(["Single", "Married", "Divorced", "Widowed"]),
-            email=email,
+            email=email,  # use generated (unique)
             password_hash=password_hash,
             phone_number=fake.phone_number(),
             address=fake.address(),
             employment_status=random.choice(["Employed", "Self-employed", "Retired"]),
             annual_income=random.randint(40000, 250000),
             risk_tolerance=random.choice(["Conservative", "Moderate", "Aggressive"]),
-            advisor_id=advisor.employee_id,
+            advisor_id=advisor.employee_id,  # use the chosen advisor
         )
 
         # generate random investments for client
@@ -190,10 +193,13 @@ def create_clients(employees, companies):
         clients.append(client)
 
     # add a fixed client for login for the client
+    fixed_plain_ssn = "666-11-1111"
     fixed_client = Client(
         client_id=9999,
         first_name="Client",
         last_name="One",
+        encrypted_ssn=encrypt_ssn(fixed_plain_ssn),  
+        ssn_hash=ssn_hash(fixed_plain_ssn),
         date_of_birth=fake.date_of_birth(minimum_age=30, maximum_age=65),
         gender="Female",
         marital_status="Single",
