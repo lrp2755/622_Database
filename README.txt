@@ -1,4 +1,9 @@
-## Overview
+## Authors
+Lianna Pottgen, lrp2755@rit.edu
+Samuel Roberts, svr9047@rit,edu
+Eton Mu, ym5445@rit.edu
+
+## Application Overview
 
 Our program is based off of a fake financial investing institution that will help our group to
 determine how data security and privacy affects users private information. Our fake financial
@@ -29,6 +34,7 @@ utilize this in order to create information like fake phone numbers, fake names,
 etc..
 
 Werkzeug is an addition that helps with our security hashing for passwords and ssn.
+
 ## Steps to Start The Program
     1.) Install dependencies
         a.) pip install flask
@@ -38,26 +44,45 @@ Werkzeug is an addition that helps with our security hashing for passwords and s
         e.) pip install psycopg2-binary
         f.) pip install sqlalchemy psycopg2-binary
     2.) psql "host=ritfinanceserver622.postgres.database.azure.com port=5432 dbname=postgres user=LiannaPottgen@ritfinanceserver622 password=Test1234! sslmode=require"
-    3.) python app.py
+    3.) python create_data.py
+        a.) note the passwords given for each account, they are randomly created. 
+    4.) python app.py
 
 ## Steps to utilize API
     Users:
         Manager:
             email: manager@example.com
-            password: password
+            password is given via python create_data.py
         Advisor:
             email: advisor@example.com
-            password: password
+            password is given via python create_data.py
         Client:
             email: client@example.com
-            password: password
+            password is given via python create_data.py
 
-Note: these passwords are temporarily "password" since this will just be utilized for this
-phase since this phase was more focused on the foundation of our project. The rest of our users
-do have random passwords that are hashed and in the future our go-to baseline users will also
-have randomized passwords that are hashed.
+## Systems & Applications Used
+    Applications: 
+        -This application utilized Microsoft Entra to act as the cloud database
+        for our simulation. In our research, we determined that Microsoft Entra is one of
+        the most commonly used cloud databases for large companies. Because of this, our 
+        program uses a small cloud database that stores limited information. Our team 
+        utilized this Entra database by using the RIT login, so it did not cost us money to
+        store the data. 
 
-## Authors
-Lianna Pottgen, lrp2755@rit.edu
-Samuel Roberts, svr9047@rit,edu
-Eton Mu, ym5445@rit.edu
+    Systems:
+        -This application utilized Flask in order to handle requests and help the API
+        for the front end of our application. Flask is a microservice that will handle using 
+        the routes of information from the backend and database into the front end API. 
+
+        - This application also utilize SQLAlchemy as our tool to interact with the local 
+        version of our database. Since we utilized SQL, this tool allowed us to analyze how 
+        data was moving through our system by giving us direct access to our database
+
+        - This application also utilizes the cryptography package from the python library.
+        This package allowed us to encrypt the SSN and PII from users before they were stored
+        in the database, and helped in creating our database access key. 
+
+        - This applicationn utilizes the werkzeug.security package from the python library 
+        as well to aid in security. This package allowed us to create random data (like 
+        names, genders, birthdays, etc...) while we created our fake client, advisors, and 
+        managers databases. This aided in our concept of data privacy as well.  

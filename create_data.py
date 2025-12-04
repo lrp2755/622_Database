@@ -1,6 +1,6 @@
 '''
     CSCI - 622 - Data Security & Privacy
-    Project Phase 2 - create_data.py
+    Project Phase 4 - create_data.py
     Authors: Samuel Roberts (svr9047) & Lianna Pottgen (lrp2755)
 
     This create_data.py file will create the randomized data and will create

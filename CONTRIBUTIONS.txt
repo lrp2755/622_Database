@@ -1,0 +1,53 @@
+CSCI.622 - Group 2 [Eton Mu, Lianna Pottgen, Samuel Roberts]
+
+### Code Contributions:
+    Eton Mu: N/A
+
+    Lianna Pottgen: 
+        - Creation of the first local database using SQL
+        - Creation of models for each user  
+        - Creation of the attributes for each user type including the randomization of each attribute
+        - Creation of the Flask-based web page
+        - Creation of Microsoft Entra Cloudbase for users
+        - Security Architecture Design & Cloud DB Design
+
+    Samuel Roberts: 
+        - Creation of encryption algorithm for SSN & passwords
+        - Addition of database encryption
+        - Updating routes to provide encryption 
+        - Code comments for Phase 4
+
+### Report Contributions:
+    Eton Mu: 
+        - Original paper revisions to the Abstract & Overivew 
+        - Legal Considerations section 
+        - Citation fixes after Phase 1 & 2
+        - Related work section 
+    
+    Lianna Pottgen:
+        - First iteration of Abstract, Overview, & Keywords
+        - First iteration of Related Work section
+        - Analysis & Conclusion Sections
+        - Design and implementation sections 
+        - Citations and references
+        - Architecture diagrams
+
+    
+    Samuel Roberts:
+        - Design and Implementation Sections 
+        - Abstract, Keywords, and Overview Revisions Phases 2-4
+        - Conclusion revision in Phase 3
+
+### Poster Contributions:
+    Eton Mu:
+        - Original Poster Draft including all sections [Problem Statement, Proposed Architecture, 
+        Implementation, Legal & Ethical Considerations, Result, & References]
+        - Original Poster Draft Bullets & Structure for all sections 
+
+    Lianna Pottgen:
+        - Final Revised Poster including feedback from office hours on 11/26 and in class feedback 
+        from 12/2
+        - Additional information provided on architecture and cloud storage benefits
+
+    Samuel Roberts: 
+        - Revised Posters including feedback from office hours on 11/26
