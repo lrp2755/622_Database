@@ -21,14 +21,17 @@ import string
 fake = Faker()
 
 
+# -- generate passwords --
 def generate_given_passwords():
     characters = string.ascii_letters + string.digits + string.punctuation
-    
+
+    # Select random characters for all passwords
     fixed_manager_pwd = ''.join(secrets.choice(characters) for i in range(15))
     fixed_advisor_pwd = ''.join(secrets.choice(characters) for i in range(15))
     fixed_client_pwd = ''.join(secrets.choice(characters) for i in range(15))
 
     return [fixed_manager_pwd, fixed_advisor_pwd, fixed_client_pwd]
+
 
 pwd_array = generate_given_passwords()
 fixed_manager_pwd = pwd_array[0]
@@ -134,13 +137,14 @@ def create_employees():
 
     return employees, managers + [fixed_manager]
 
+
 # -- create clients --
 def create_clients(employees, companies):
     # initiate clients
     clients = []
     advisors = []
     for employee in employees:
-        if(employee.job_title != "Manager"):
+        if employee.job_title != "Manager":
             advisors.append(employee)
 
     # prep for user investments

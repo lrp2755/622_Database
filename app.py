@@ -30,6 +30,8 @@ Base.metadata.create_all(bind=engine)
     If the user does not have a valid username and password, then they wil not be able to log in.
     Else, they will log in and go to their respective dashboard(client, advisor, manager)
 '''
+
+
 @app.route("/", methods=["GET", "POST"])
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -65,7 +67,7 @@ def login():
                 session["user_id"] = employee.employee_id
                 return redirect(url_for("employee_dashboard"))
 
-        # if we didn't have the right credientials, prompt the user.
+        # if we didn't have the right credentials, prompt the user.
         flash("Invalid credentials")
 
     return render_template("login.html")
@@ -118,6 +120,7 @@ def manager_dashboard():
         hierarchy=hierarchy
     )
 
+
 # -- employee dashboard --
 @app.route("/employee_dashboard")
 def employee_dashboard():
@@ -140,7 +143,7 @@ def employee_dashboard():
     clients_list = []
     emp_clients = db.query(Client).filter(Client.advisor_id == employee.employee_id).all()
 
-    # for all of the clients this employee has
+    # for all the clients this employee has
     for clients in emp_clients:
         if verified_client_id == clients.client_id:
             investments = db.query(Investment).filter(Investment.client_id == clients.client_id).all()
@@ -167,6 +170,7 @@ def employee_dashboard():
         client_requests=client_requests
     )
 
+
 # -- employee approval --
 @app.route("/advisor_create_investment/<int:request_id>", methods=["POST"])
 def advisor_create_investment(request_id):
@@ -180,6 +184,7 @@ def advisor_create_investment(request_id):
     db.commit()
     flash("Investment prepared. Client must approve.")
     return redirect(url_for("employee_dashboard"))
+
 
 # -- client dashboard --
 @app.route("/client_dashboard")
@@ -212,9 +217,11 @@ def client_dashboard():
         client=client,
         advisor=advisor,
         investments=investments,
-        requests = requests
+        requests=requests
     )
-# -- client request investment -- 
+
+
+# -- client request investment --
 @app.route("/create_investment_request", methods=["POST"])
 def create_investment_request():
     if session.get("user_type") != "client":
@@ -235,6 +242,7 @@ def create_investment_request():
     db.commit()
     flash("Investment request sent to your advisor.")
     return redirect(url_for("client_dashboard"))
+
 
 @app.route("/approve_request/<int:request_id>", methods=["POST"])
 def approve_request(request_id):
@@ -259,6 +267,7 @@ def approve_request(request_id):
     flash("Investment request approved and investment created")
     return redirect(url_for("employee_dashboard"))
 
+
 @app.route("/deny_request/<int:request_id>", methods=["POST"])
 def deny_request(request_id):
     db = SessionLocal()
@@ -271,6 +280,7 @@ def deny_request(request_id):
     db.commit()
     flash("Investment request denied")
     return redirect(url_for("employee_dashboard"))
+
 
 # -- request investments with no parmas
 @app.route("/request_investment", methods=["GET", "POST"])
@@ -290,16 +300,18 @@ def request_investment():
     # Get all companies for dropdown
     companies = db.query(Company).all()
 
+    # Verify if the company can be invested in
     if request.method == "POST":
         company_id = request.form.get("company_id")
         shares = request.form.get("shares")
         purchase_price = request.form.get("purchase_price_per_share")
 
-        # Validation
+        # Validate all required field exist
         if not company_id or not shares or not purchase_price:
             flash("All fields are required")
             return redirect(request.url)
 
+        # Make the investment request
         try:
             new_request = InvestmentRequest(
                 client_id=client.client_id,
@@ -335,7 +347,8 @@ def approve_investment(request_id):
     session["requested_request_id"] = request_id
     return redirect(url_for("security_check_for_investment"))
 
-# -- client investment approval validation -- 
+
+# -- client investment approval validation --
 @app.route("/security_check_investment", methods=["GET", "POST"])
 def security_check_for_investment():
     db = SessionLocal()
@@ -344,7 +357,7 @@ def security_check_for_investment():
     req = db.query(InvestmentRequest).get(request_id)
 
     if request.method == "POST":
-        password = request.form.get("password")
+        password = request.form.get("password")  # Verify the requestor of the investment
         if check_password_hash(client.password_hash, password):
             # Create the actual investment
             investment = Investment(
@@ -367,11 +380,9 @@ def security_check_for_investment():
     return render_template("security_check.html", client_id=client.client_id)
 
 
-
 # -- requesting to see information --
 @app.route("/request_client_info/<int:client_id>", methods=["POST"])
 def request_client_info(client_id):
-
     # check we are a manager / advisor
     if session.get("user_type") not in ["manager", "employee"]:
         return redirect(url_for("login"))
@@ -379,6 +390,7 @@ def request_client_info(client_id):
     # get client
     session["requested_client_id"] = client_id
     return redirect(url_for("security_check", client_id=client_id))
+
 
 # -- security check for seeing investments --
 @app.route("/security_check/<int:client_id>", methods=["GET", "POST"])
@@ -406,12 +418,14 @@ def security_check(client_id):
     # return security check
     return render_template("security_check.html", client_id=client_id)
 
+
 # -- logout user --
 @app.route("/logout")
 def logout():
     # logout!
     session.clear()
     return redirect(url_for("login"))
+
 
 if __name__ == "__main__":
     app.run(debug=True)
