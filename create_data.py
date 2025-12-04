@@ -15,8 +15,25 @@ from werkzeug.security import generate_password_hash
 from database import SessionLocal, engine
 from models import Base, Employee, Client, Investment, Company
 from snn_key import encrypt_ssn, ssn_hash
+import secrets
+import string
 
 fake = Faker()
+
+
+def generate_given_passwords():
+    characters = string.ascii_letters + string.digits + string.punctuation
+    
+    fixed_manager_pwd = ''.join(secrets.choice(characters) for i in range(15))
+    fixed_advisor_pwd = ''.join(secrets.choice(characters) for i in range(15))
+    fixed_client_pwd = ''.join(secrets.choice(characters) for i in range(15))
+
+    return [fixed_manager_pwd, fixed_advisor_pwd, fixed_client_pwd]
+
+pwd_array = generate_given_passwords()
+fixed_manager_pwd = pwd_array[0]
+fixed_advisor_pwd = pwd_array[1]
+fixed_client_pwd = pwd_array[2]
 
 # -- create companies --
 def create_companies():
@@ -83,7 +100,7 @@ def create_employees():
         date_of_birth=fake.date_of_birth(minimum_age=35, maximum_age=60),
         gender="Male",
         work_email="manager@example.com",
-        password_hash=generate_password_hash("password"),
+        password_hash= fixed_manager_pwd,
         phone_number=fake.phone_number(),
         address=fake.address(),
         start_date=fake.date_between(start_date='-10y', end_date='-1y'),
@@ -100,7 +117,7 @@ def create_employees():
         date_of_birth=fake.date_of_birth(minimum_age=25, maximum_age=50),
         gender="Female",
         work_email="advisor@example.com",
-        password_hash=generate_password_hash("password"),
+        password_hash= fixed_advisor_pwd,
         phone_number=fake.phone_number(),
         address=fake.address(),
         start_date=fake.date_between(start_date='-10y', end_date='-1y'),
@@ -192,7 +209,7 @@ def create_clients(employees, companies):
         advisor.clients.append(client)
         clients.append(client)
 
-    # add a fixed client for login for the client
+    # adding a fixed client for login for the client
     fixed_plain_ssn = "666-11-1111"
     fixed_client = Client(
         client_id=9999,
@@ -204,7 +221,7 @@ def create_clients(employees, companies):
         gender="Female",
         marital_status="Single",
         email="client@example.com",
-        password_hash=generate_password_hash("password"),
+        password_hash= fixed_client_pwd,
         phone_number=fake.phone_number(),
         address=fake.address(),
         employment_status="Employed",
@@ -275,10 +292,10 @@ def main():
 
     # printing for double check on success
     print("Database created successfully!")
-    print("\nSample Login Credentials (password for all users: 'password'):")
-    print("Manager login: manager@example.com")
-    print("Advisor login: advisor@example.com")
-    print("Client login: client@example.com")
+    print("\nSample Login Credentials:")
+    print("Manager login: manager@example.com, Password: "+str(fixed_manager_pwd))
+    print("Advisor login: advisor@example.com, Password: "+str(fixed_advisor_pwd))
+    print("Client login: client@example.com, Password: "+str(fixed_client_pwd))
 
 if __name__ == "__main__":
     main()
