@@ -61,3 +61,28 @@ Werkzeug is an addition that helps with our security hashing for passwords and s
             password is given via python create_data.py
 
 ## Systems & Applications Used
+    Applications: 
+        -This application utilized Microsoft Entra to act as the cloud database
+        for our simulation. In our research, we determined that Microsoft Entra is one of
+        the most commonly used cloud databases for large companies. Because of this, our 
+        program uses a small cloud database that stores limited information. Our team 
+        utilized this Entra database by using the RIT login, so it did not cost us money to
+        store the data. 
+
+    Systems:
+        -This application utilized Flask in order to handle requests and help the API
+        for the front end of our application. Flask is a microservice that will handle using 
+        the routes of information from the backend and database into the front end API. 
+
+        - This application also utilize SQLAlchemy as our tool to interact with the local 
+        version of our database. Since we utilized SQL, this tool allowed us to analyze how 
+        data was moving through our system by giving us direct access to our database
+
+        - This application also utilizes the cryptography package from the python library.
+        This package allowed us to encrypt the SSN and PII from users before they were stored
+        in the database, and helped in creating our database access key. 
+
+        - This applicationn utilizes the werkzeug.security package from the python library 
+        as well to aid in security. This package allowed us to create random data (like 
+        names, genders, birthdays, etc...) while we created our fake client, advisors, and 
+        managers databases. This aided in our concept of data privacy as well.  

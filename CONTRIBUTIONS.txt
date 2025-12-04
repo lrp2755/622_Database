@@ -4,7 +4,7 @@ CSCI.622 - Group 2 [Eton Mu, Lianna Pottgen, Samuel Roberts]
     Eton Mu: N/A
 
     Lianna Pottgen: 
-        - Creation of the first database
+        - Creation of the first local database using SQL
         - Creation of models for each user  
         - Creation of the attributes for each user type including the randomization of each attribute
         - Creation of the Flask-based web page
